@@ -1,73 +1,120 @@
-# Welcome to your Lovable project
+# SnapCut AI ✂️
 
-## Project info
+> AI-powered background removal in seconds. Professional results, zero effort.
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![API](https://img.shields.io/badge/API-RESTful-blue.svg)](https://snapcut.ai/api)
+[![Free Tier](https://img.shields.io/badge/Free-5%20images%2Fday-green.svg)](https://snapcut.ai)
 
-## How can I edit this code?
+---
 
-There are several ways of editing your application.
+## 🚀 Overview
 
-**Use Lovable**
+**SnapCut AI** is an enterprise-grade background removal tool powered by cutting-edge AI models. Upload any image and get a professional transparent background in under 5 seconds — no design skills required.
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
+- ✨ **5 free images daily** — no signup required to try
+- ⚡ Results in under 5 seconds
+- 🔒 Images auto-deleted after 24 hours
 
-Changes made via Lovable will be committed automatically to this repo.
+---
 
-**Use your preferred IDE**
+## ✨ Features
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+| Feature | Description |
+|---|---|
+| ⚡ **Lightning Fast** | Optimized AI pipeline processes images in under 5 seconds |
+| 🎯 **Pixel-Perfect Results** | Advanced edge detection preserves fine details like hair and transparent objects |
+| 🛠️ **Developer API** | RESTful API with SDK support for seamless app integration |
+| 🔒 **Secure & Private** | Images auto-delete after 24 hours. No permanent storage. HTTPS everywhere |
+| 📦 **Batch Processing** | Process multiple images at once — perfect for e-commerce and studios |
+| 📱 **Works Everywhere** | Mobile-first responsive design. Upload from any device, anywhere |
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+---
 
-Follow these steps:
+## 💰 Pricing
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+### Free — ₹0/forever
+- 5 images per day
+- Standard quality
+- Web upload only
+- Community support
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+### Pro — ₹499/month ⭐ Most Popular
+- Unlimited images
+- HD quality output
+- API access
+- Batch processing
+- Priority support
+- No watermarks
 
-# Step 3: Install the necessary dependencies.
-npm i
+### Credits — ₹99 / 50 credits
+- 50 image credits (pay as you go)
+- HD quality output
+- API access
+- Never expires
+- Bulk discounts available
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
+---
+
+## 🛠️ API
+
+SnapCut AI provides a RESTful API with SDK support, allowing you to integrate background removal directly into your applications.
+
+📖 [View API Docs →](https://snapcut.ai/api)
+
+### Quick Example
+
+```bash
+curl -X POST https://api.snapcut.ai/v1/remove-background \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -F "image=@photo.jpg"
 ```
 
-**Edit a file directly in GitHub**
+> API access is available on **Pro** and **Credits** plans.
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+---
 
-**Use GitHub Codespaces**
+## 🖼️ How It Works
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+1. **Upload** your image via the web interface or API
+2. **AI processes** the image using advanced edge detection
+3. **Download** your image with a clean, transparent background — in under 5 seconds
 
-## What technologies are used for this project?
+---
 
-This project is built with:
+## 🔐 Privacy & Security
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+- All images are **automatically deleted after 24 hours**
+- No permanent image storage
+- **HTTPS** enforced across all endpoints
+- No account required to try the free tier
 
-## How can I deploy this project?
+---
 
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
+## 📌 Use Cases
 
-## Can I connect a custom domain to my Lovable project?
+- 🛍️ **E-commerce** — Clean product photos at scale with batch processing
+- 🎨 **Designers** — Quick background removal without Photoshop
+- 📸 **Photographers** — Isolate subjects with pixel-perfect precision
+- 👨‍💻 **Developers** — Automate background removal in your own apps via API
 
-Yes, you can!
+---
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+## 🔗 Links
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+- 🌐 [Website](https://snapcut.ai)
+- 📖 [API Documentation](https://snapcut.ai/api)
+- 💬 [About](https://snapcut.ai/about)
+- 📝 [Blog](https://snapcut.ai/blog)
+- 📬 [Contact](https://snapcut.ai/contact)
+
+---
+
+## 📄 Legal
+
+- [Privacy Policy](https://snapcut.ai/privacy)
+- [Terms of Service](https://snapcut.ai/terms)
+
+---
+
+© 2026 SnapCut AI. All rights reserved.
