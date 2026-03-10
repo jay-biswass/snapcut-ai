@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { Upload, Zap, ArrowRight } from "lucide-react";
+import ImageUploadZone from "@/components/ImageUploadZone";
 
 const HeroSection = () => {
   return (
@@ -46,22 +47,9 @@ const HeroSection = () => {
             ✨ 5 free images daily • No signup required to try
           </p>
 
-          {/* Demo preview area */}
+          {/* Live upload + preview area — no login required */}
           <div className="mt-12 glass-card rounded-2xl p-8 max-w-3xl mx-auto border border-border/30">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
-              <div className="bg-muted/30 rounded-xl aspect-square flex items-center justify-center border border-dashed border-border/50">
-                <div className="text-center space-y-2">
-                  <Upload size={32} className="mx-auto text-muted-foreground" />
-                  <p className="text-sm text-muted-foreground">Original Image</p>
-                </div>
-              </div>
-              <div className="relative rounded-xl aspect-square flex items-center justify-center overflow-hidden" style={{ background: 'repeating-conic-gradient(hsl(var(--muted)) 0% 25%, transparent 0% 50%) 50% / 20px 20px' }}>
-                <div className="text-center space-y-2">
-                  <Zap size={32} className="mx-auto text-primary" />
-                  <p className="text-sm text-muted-foreground">Background Removed</p>
-                </div>
-              </div>
-            </div>
+            <ImageUploadZone compact />
           </div>
         </div>
       </div>
