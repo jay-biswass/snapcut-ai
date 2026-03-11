@@ -30,8 +30,9 @@ async function removeBackgroundFromFile(file: File): Promise<string> {
   }
 
   // n8n returns JSON: { "url": "https://..." }
+  // Force https — n8n/Cloudinary sometimes returns http:// which browsers block on HTTPS sites
   const data = await response.json();
-  return data.url as string;
+  return (data.url as string).replace(/^http:\/\//, "https://");
 }
 
 // Send an image URL to the n8n webhook so it can fetch & process it
@@ -49,8 +50,9 @@ async function removeBackgroundFromUrl(imageUrl: string): Promise<string> {
   }
 
   // n8n returns JSON: { "url": "https://..." }
+  // Force https — n8n/Cloudinary sometimes returns http:// which browsers block on HTTPS sites
   const data = await response.json();
-  return data.url as string;
+  return (data.url as string).replace(/^http:\/\//, "https://");
 }
 
 // Force-download any URL. For Cloudinary URLs we use the fl_attachment
@@ -59,8 +61,10 @@ async function removeBackgroundFromUrl(imageUrl: string): Promise<string> {
 // For other URLs we fall back to a fetch-blob approach.
 export async function forceDownload(url: string, filename = "snapcut-result.png") {
   // Cloudinary URL pattern: https://res.cloudinary.com/<cloud>/image/upload/<options>/v<version>/<path>
+  // Normalize to https first (in case an old http URL slipped through from history)
+  const safeUrl = url.replace(/^http:\/\//, "https://");
   const cloudinaryRegex = /^(https:\/\/res\.cloudinary\.com\/[^/]+\/image\/upload\/)(v\d+\/.+)$/;
-  const match = url.match(cloudinaryRegex);
+  const match = safeUrl.match(cloudinaryRegex);
 
   if (match) {
     // Insert fl_attachment/<filename> before the version segment
@@ -77,7 +81,7 @@ export async function forceDownload(url: string, filename = "snapcut-result.png"
 
   // Non-Cloudinary URLs: try fetch → blob → object URL download
   try {
-    const res = await fetch(url);
+    const res = await fetch(safeUrl);
     const blob = await res.blob();
     const blobUrl = URL.createObjectURL(blob);
     const a = document.createElement("a");
