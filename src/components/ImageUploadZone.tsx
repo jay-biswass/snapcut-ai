@@ -53,9 +53,29 @@ async function removeBackgroundFromUrl(imageUrl: string): Promise<string> {
   return data.url as string;
 }
 
-// Force-download any URL (including cross-origin Cloudinary URLs) by fetching
-// it as a blob first, then triggering a synthetic anchor click.
+// Force-download any URL. For Cloudinary URLs we use the fl_attachment
+// transformation flag which makes Cloudinary return the image with a
+// Content-Disposition: attachment header — no fetch() needed, no CORS issues.
+// For other URLs we fall back to a fetch-blob approach.
 export async function forceDownload(url: string, filename = "snapcut-result.png") {
+  // Cloudinary URL pattern: https://res.cloudinary.com/<cloud>/image/upload/<options>/v<version>/<path>
+  const cloudinaryRegex = /^(https:\/\/res\.cloudinary\.com\/[^/]+\/image\/upload\/)(v\d+\/.+)$/;
+  const match = url.match(cloudinaryRegex);
+
+  if (match) {
+    // Insert fl_attachment/<filename> before the version segment
+    const downloadUrl = `${match[1]}fl_attachment:${filename.replace(/\.[^.]+$/, "")}/${match[2]}`;
+    const a = document.createElement("a");
+    a.href = downloadUrl;
+    a.download = filename;
+    a.rel = "noopener noreferrer";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    return;
+  }
+
+  // Non-Cloudinary URLs: try fetch → blob → object URL download
   try {
     const res = await fetch(url);
     const blob = await res.blob();
@@ -68,7 +88,6 @@ export async function forceDownload(url: string, filename = "snapcut-result.png"
     a.remove();
     URL.revokeObjectURL(blobUrl);
   } catch {
-    // Fallback: open in new tab if fetch fails (CORS restriction)
     window.open(url, "_blank");
   }
 }
