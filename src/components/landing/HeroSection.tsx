@@ -50,6 +50,14 @@ const HeroSection = () => {
           {/* Live upload + preview area — no login required */}
           <div className="mt-12 glass-card rounded-2xl p-8 max-w-3xl mx-auto border border-border/30">
             <ImageUploadZone compact />
+            
+            <div className="mt-4 text-center">
+              <Button variant="ghost" className="text-muted-foreground hover:text-foreground" asChild>
+                <Link to="/dashboard/history">
+                  View your recent uploads history
+                </Link>
+              </Button>
+            </div>
           </div>
         </div>
       </div>
