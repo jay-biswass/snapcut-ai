@@ -71,7 +71,37 @@ export interface CheckoutParams {
 }
 
 /**
+ * Dynamically loads the Razorpay checkout.js script on demand.
+ * Only loads once — subsequent calls resolve immediately.
+ */
+function loadRazorpayScript(): Promise<void> {
+  return new Promise((resolve, reject) => {
+    // Already loaded
+    if (typeof window.Razorpay !== "undefined") {
+      resolve();
+      return;
+    }
+
+    // Check if script tag already exists (loading in progress)
+    const existing = document.querySelector('script[src="https://checkout.razorpay.com/v1/checkout.js"]');
+    if (existing) {
+      existing.addEventListener("load", () => resolve());
+      existing.addEventListener("error", () => reject(new Error("Failed to load Razorpay SDK")));
+      return;
+    }
+
+    const script = document.createElement("script");
+    script.src = "https://checkout.razorpay.com/v1/checkout.js";
+    script.async = true;
+    script.onload = () => resolve();
+    script.onerror = () => reject(new Error("Failed to load Razorpay SDK"));
+    document.head.appendChild(script);
+  });
+}
+
+/**
  * Opens the Razorpay Standard Checkout popup.
+ * Loads the Razorpay SDK on-demand (only when a payment button is clicked).
  *
  * @example
  * openRazorpayCheckout({
@@ -81,7 +111,7 @@ export interface CheckoutParams {
  *   onSuccess: (res) => console.log("Payment ID:", res.razorpay_payment_id),
  * });
  */
-export function openRazorpayCheckout({
+export async function openRazorpayCheckout({
   planName,
   amount,
   description,
@@ -89,7 +119,7 @@ export function openRazorpayCheckout({
   onSuccess,
   onFailure,
   onDismiss,
-}: CheckoutParams): void {
+}: CheckoutParams): Promise<void> {
   const keyId = import.meta.env.VITE_RAZORPAY_KEY_ID;
   const companyName = import.meta.env.VITE_RAZORPAY_COMPANY_NAME || "SnapCut AI";
   const themeColor = import.meta.env.VITE_RAZORPAY_THEME_COLOR || "#7c3aed";
@@ -104,8 +134,10 @@ export function openRazorpayCheckout({
     return;
   }
 
-  if (typeof window.Razorpay === "undefined") {
-    console.error("Razorpay SDK not loaded. Check if checkout.js is included in index.html.");
+  // Load Razorpay SDK on demand
+  try {
+    await loadRazorpayScript();
+  } catch {
     alert("Payment service is temporarily unavailable. Please try again later.");
     return;
   }
