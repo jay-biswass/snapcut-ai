@@ -11,6 +11,13 @@ import HistoryPage from "./pages/History";
 import NotFound from "./pages/NotFound";
 import DashboardLayout from "./components/DashboardLayout";
 
+// Policy & Legal Pages
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import TermsAndConditions from "./pages/TermsAndConditions";
+import RefundPolicy from "./pages/RefundPolicy";
+import ShippingDelivery from "./pages/ShippingDelivery";
+import ContactUs from "./pages/ContactUs";
+
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -31,6 +38,13 @@ const App = () => (
             {/* Redirect any other /dashboard/* to dashboard home */}
             <Route path="*" element={<Navigate to="/dashboard" replace />} />
           </Route>
+
+          {/* Policy & Legal Pages */}
+          <Route path="/privacy" element={<PrivacyPolicy />} />
+          <Route path="/terms" element={<TermsAndConditions />} />
+          <Route path="/refund" element={<RefundPolicy />} />
+          <Route path="/shipping" element={<ShippingDelivery />} />
+          <Route path="/contact" element={<ContactUs />} />
 
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />

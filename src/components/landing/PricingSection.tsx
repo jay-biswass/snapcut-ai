@@ -1,6 +1,8 @@
 import { Button } from "@/components/ui/button";
 import { Check } from "lucide-react";
 import { Link } from "react-router-dom";
+import { openRazorpayCheckout } from "@/lib/razorpay";
+import { toast } from "sonner";
 
 const plans = [
   {
@@ -11,6 +13,7 @@ const plans = [
     features: ["5 images per day", "Standard quality", "Web upload only", "Community support"],
     cta: "Get Started",
     popular: false,
+    amount: 0,
   },
   {
     name: "Pro",
@@ -27,6 +30,7 @@ const plans = [
     ],
     cta: "Start Pro Trial",
     popular: true,
+    amount: 49900, // ₹499 in paise
   },
   {
     name: "Credits",
@@ -36,10 +40,36 @@ const plans = [
     features: ["50 image credits", "HD quality output", "API access", "Never expires", "Bulk discounts"],
     cta: "Buy Credits",
     popular: false,
+    amount: 9900, // ₹99 in paise
   },
 ];
 
 const PricingSection = () => {
+  const handlePayment = (plan: typeof plans[0]) => {
+    if (plan.amount === 0) return; // Free plan, no payment needed
+
+    openRazorpayCheckout({
+      planName: plan.name,
+      amount: plan.amount,
+      description: `SnapCut AI - ${plan.name} Plan`,
+      onSuccess: (response) => {
+        toast.success("Payment successful!", {
+          description: `Payment ID: ${response.razorpay_payment_id}`,
+        });
+      },
+      onFailure: (response) => {
+        toast.error("Payment failed", {
+          description: response.error.description,
+        });
+      },
+      onDismiss: () => {
+        toast.info("Payment cancelled", {
+          description: "You can try again anytime.",
+        });
+      },
+    });
+  };
+
   return (
     <section id="pricing" className="py-24 relative">
       <div className="container mx-auto px-4">
@@ -85,13 +115,23 @@ const PricingSection = () => {
                 ))}
               </ul>
 
-              <Button
-                variant={plan.popular ? "gradient" : "outline"}
-                className="w-full"
-                asChild
-              >
-                <Link to="/register">{plan.cta}</Link>
-              </Button>
+              {plan.amount === 0 ? (
+                <Button
+                  variant="outline"
+                  className="w-full"
+                  asChild
+                >
+                  <Link to="/register">{plan.cta}</Link>
+                </Button>
+              ) : (
+                <Button
+                  variant={plan.popular ? "gradient" : "outline"}
+                  className="w-full"
+                  onClick={() => handlePayment(plan)}
+                >
+                  {plan.cta}
+                </Button>
+              )}
             </div>
           ))}
         </div>

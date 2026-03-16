@@ -26,7 +26,7 @@ const Footer = () => {
             <h4 className="font-semibold text-foreground mb-3 text-sm">Company</h4>
             <ul className="space-y-2 text-sm text-muted-foreground">
               <li><Link to="/about" className="hover:text-foreground transition-colors">About</Link></li>
-              <li><Link to="/contact" className="hover:text-foreground transition-colors">Contact</Link></li>
+              <li><Link to="/contact" className="hover:text-foreground transition-colors">Contact Us</Link></li>
               <li><Link to="/blog" className="hover:text-foreground transition-colors">Blog</Link></li>
             </ul>
           </div>
@@ -35,7 +35,9 @@ const Footer = () => {
             <h4 className="font-semibold text-foreground mb-3 text-sm">Legal</h4>
             <ul className="space-y-2 text-sm text-muted-foreground">
               <li><Link to="/privacy" className="hover:text-foreground transition-colors">Privacy Policy</Link></li>
-              <li><Link to="/terms" className="hover:text-foreground transition-colors">Terms of Service</Link></li>
+              <li><Link to="/terms" className="hover:text-foreground transition-colors">Terms & Conditions</Link></li>
+              <li><Link to="/refund" className="hover:text-foreground transition-colors">Refund & Cancellation</Link></li>
+              <li><Link to="/shipping" className="hover:text-foreground transition-colors">Shipping & Delivery</Link></li>
             </ul>
           </div>
         </div>
