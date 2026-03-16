@@ -10,6 +10,7 @@ import Dashboard from "./pages/Dashboard";
 import HistoryPage from "./pages/History";
 import NotFound from "./pages/NotFound";
 import DashboardLayout from "./components/DashboardLayout";
+import ScrollToTop from "./components/ScrollToTop";
 
 // Policy & Legal Pages
 import PrivacyPolicy from "./pages/PrivacyPolicy";
@@ -26,6 +27,7 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
+        <ScrollToTop />
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/login" element={<Login />} />
