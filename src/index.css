@@ -6,6 +6,7 @@
 
 @layer base {
   :root {
+    scroll-behavior: smooth;
     --background: 222 47% 3%;
     --foreground: 220 14% 90%;
 

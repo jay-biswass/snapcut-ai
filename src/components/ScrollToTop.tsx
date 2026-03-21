@@ -4,12 +4,13 @@ import { useLocation } from "react-router-dom";
 const ScrollToTop = () => {
   const { pathname } = useLocation();
 
-  // useLayoutEffect fires synchronously before the browser paints
   useLayoutEffect(() => {
-    // Multiple approaches to ensure scroll works across browsers
-    window.scrollTo({ top: 0, left: 0, behavior: "instant" });
-    document.documentElement.scrollTop = 0;
-    document.body.scrollTop = 0; // For Safari
+    // Scroll to the top of the page with a smooth animation
+    window.scrollTo({
+      top: 0,
+      left: 0,
+      behavior: "smooth"
+    });
   }, [pathname]);
 
   return null;
