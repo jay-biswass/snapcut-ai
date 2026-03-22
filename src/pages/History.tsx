@@ -16,7 +16,17 @@ function formatDate(ts: number) {
 }
 
 export default function History() {
-  const { history, removeEntry, clearHistory } = useHistory();
+  const { history, loading, removeEntry, clearHistory } = useHistory();
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center p-12">
+        <div className="animate-spin text-primary">
+          <Clock size={32} />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
