@@ -3,6 +3,8 @@ import { Upload, Zap, X, Download, Loader2, Link2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { useHistory } from "@/hooks/useHistory";
+import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
 
 interface ImageUploadZoneProps {
   compact?: boolean; // true = homepage preview mode, false = full dashboard mode
@@ -101,6 +103,7 @@ export default function ImageUploadZone({ compact = false }: ImageUploadZoneProp
   const { addEntry } = useHistory();
   const inputRef = useRef<HTMLInputElement>(null);
   const zoneRef = useRef<HTMLDivElement>(null);
+  const navigate = useNavigate();
 
   const [stage, setStage] = useState<Stage>("idle");
   const [dragging, setDragging] = useState(false);
@@ -109,6 +112,32 @@ export default function ImageUploadZone({ compact = false }: ImageUploadZoneProp
   const [currentFilename, setCurrentFilename] = useState<string>("image");
   const [urlInputVisible, setUrlInputVisible] = useState(false);
   const [urlInput, setUrlInput] = useState("");
+
+  const checkAuthAndCredits = useCallback(async (): Promise<boolean> => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      toast({ title: "Authentication required", description: "Please log in to remove backgrounds.", variant: "destructive" });
+      navigate("/login");
+      return false;
+    }
+
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("credits")
+      .eq("id", user.id)
+      .single();
+
+    if (!profile || (profile.credits ?? 0) <= 0) {
+      toast({ 
+        title: "No credits left", 
+        description: "You've used all your free credits. Wait for next month or upgrade to Pro.", 
+        variant: "destructive" 
+      });
+      return false;
+    }
+
+    return true;
+  }, [navigate, toast]);
 
   // ─── Process a File object ────────────────────────────────────────────────
   const processFile = useCallback(
@@ -121,22 +150,42 @@ export default function ImageUploadZone({ compact = false }: ImageUploadZoneProp
         toast({ title: "File too large", description: "Maximum file size is 10 MB.", variant: "destructive" });
         return;
       }
+      
+      const canProceed = await checkAuthAndCredits();
+      if (!canProceed) return;
+
       const preview = URL.createObjectURL(file);
       setOriginalUrl(preview);
       setCurrentFilename(file.name.replace(/\.[^.]+$/, "") || "image");
       setStage("processing");
+      
+      const startTime = performance.now();
+      const expectedTimeMs = 3500;
+
       try {
         const result = await removeBackgroundFromFile(file);
+        const generationTimeMs = Math.round(performance.now() - startTime);
+        
         setResultUrl(result);
         setStage("done");
+        
+        await supabase.rpc('decrement_credit');
+
         // ── Persist to localStorage history ──────────────────────────────
-        addEntry({ originalUrl: preview, resultUrl: result, filename: file.name });
+        addEntry({ 
+          originalUrl: preview, 
+          resultUrl: result, 
+          filename: file.name,
+          generationTimeMs,
+          expectedTimeMs,
+          downloadCount: 0
+        });
       } catch {
         setStage("error");
         toast({ title: "Error", description: "Failed to remove background. Please try again.", variant: "destructive" });
       }
     },
-    [toast, addEntry]
+    [toast, addEntry, checkAuthAndCredits]
   );
 
   // ─── Process an image URL ─────────────────────────────────────────────────
@@ -147,23 +196,43 @@ export default function ImageUploadZone({ compact = false }: ImageUploadZoneProp
         toast({ title: "Invalid URL", description: "Please paste a valid image URL starting with http:// or https://", variant: "destructive" });
         return;
       }
+
+      const canProceed = await checkAuthAndCredits();
+      if (!canProceed) return;
+
       setOriginalUrl(trimmed);
       setCurrentFilename("image-from-url");
       setUrlInputVisible(false);
       setUrlInput("");
       setStage("processing");
+      
+      const startTime = performance.now();
+      const expectedTimeMs = 3500;
+
       try {
         const result = await removeBackgroundFromUrl(trimmed);
+        const generationTimeMs = Math.round(performance.now() - startTime);
+
         setResultUrl(result);
         setStage("done");
+        
+        await supabase.rpc('decrement_credit');
+
         // ── Persist to localStorage history ──────────────────────────────
-        addEntry({ originalUrl: trimmed, resultUrl: result, filename: "image-from-url.png" });
+        addEntry({ 
+          originalUrl: trimmed, 
+          resultUrl: result, 
+          filename: "image-from-url.png",
+          generationTimeMs,
+          expectedTimeMs,
+          downloadCount: 0
+        });
       } catch {
         setStage("error");
         toast({ title: "Error", description: "Could not fetch or process that image URL.", variant: "destructive" });
       }
     },
-    [toast, addEntry]
+    [toast, addEntry, checkAuthAndCredits]
   );
 
   // ─── Drag & Drop handlers ─────────────────────────────────────────────────

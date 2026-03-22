@@ -1,5 +1,6 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Download, Trash2, Clock, Image, ArrowLeft } from "lucide-react";
+import { Download, Trash2, Clock, Image, ArrowLeft, Edit2, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useHistory } from "@/hooks/useHistory";
 import { forceDownload } from "@/components/ImageUploadZone";
@@ -16,7 +17,27 @@ function formatDate(ts: number) {
 }
 
 export default function History() {
-  const { history, loading, removeEntry, clearHistory } = useHistory();
+  const { history, loading, removeEntry, clearHistory, updateFileName, incrementDownload } = useHistory();
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editName, setEditName] = useState("");
+
+  const startEdit = (id: string, currentName: string) => {
+    setEditingId(id);
+    setEditName(currentName);
+  };
+
+  const saveEdit = () => {
+    if (editingId && editName.trim()) {
+      updateFileName(editingId, editName.trim());
+    }
+    setEditingId(null);
+  };
+
+  const handleDownload = (ev: React.MouseEvent, url: string, filename: string, id: string) => {
+    ev.stopPropagation();
+    forceDownload(url, `snapcut-${filename}`);
+    incrementDownload(id);
+  };
 
   if (loading) {
     return (
@@ -98,7 +119,7 @@ export default function History() {
                   <Button
                     size="sm"
                     variant="gradient"
-                    onClick={() => forceDownload(entry.resultUrl, `snapcut-${entry.filename}`)}
+                    onClick={(e) => handleDownload(e, entry.resultUrl, entry.filename, entry.id)}
                   >
                     <Download size={14} /> Download
                   </Button>
@@ -115,18 +136,50 @@ export default function History() {
 
               {/* Card footer */}
               <div className="p-3 flex items-center justify-between gap-2">
-                <div className="min-w-0">
-                  <p className="text-sm font-medium text-foreground truncate">{entry.filename}</p>
-                  <div className="flex items-center gap-1 text-xs text-muted-foreground mt-0.5">
-                    <Clock size={11} />
-                    {formatDate(entry.processedAt)}
+                <div className="min-w-0 flex-1">
+                  {editingId === entry.id ? (
+                    <div className="flex items-center gap-2">
+                      <input
+                        autoFocus
+                        value={editName}
+                        onChange={(e) => setEditName(e.target.value)}
+                        onKeyDown={(e) => e.key === "Enter" && saveEdit()}
+                        onBlur={saveEdit}
+                        className="text-sm font-medium bg-muted/50 border border-primary/30 rounded px-2 py-0.5 w-full outline-none focus:border-primary"
+                      />
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-2 group/edit cursor-text" onClick={() => startEdit(entry.id, entry.filename)}>
+                      <p className="text-sm font-medium text-foreground truncate">{entry.filename}</p>
+                      <Edit2 size={12} className="text-muted-foreground opacity-0 group-hover/edit:opacity-100 transition-opacity" />
+                    </div>
+                  )}
+
+                  <div className="flex items-center gap-1 text-xs text-muted-foreground mt-0.5 whitespace-nowrap overflow-hidden">
+                    <Clock size={11} className="shrink-0" />
+                    <span>{formatDate(entry.processedAt)}</span>
+                    
+                    {entry.generationTimeMs > 0 && (
+                      <>
+                        <span className="mx-0.5 opacity-50">•</span>
+                        <span>{(entry.generationTimeMs / 1000).toFixed(1)}s</span>
+                      </>
+                    )}
+                    
+                    {entry.downloadCount > 0 && (
+                      <>
+                        <span className="mx-0.5 opacity-50">•</span>
+                        <Download size={10} className="shrink-0" />
+                        <span>{entry.downloadCount}</span>
+                      </>
+                    )}
                   </div>
                 </div>
                 <Button
                   size="sm"
                   variant="ghost"
                   className="shrink-0"
-                  onClick={() => forceDownload(entry.resultUrl, `snapcut-${entry.filename}`)}
+                  onClick={(e) => handleDownload(e, entry.resultUrl, entry.filename, entry.id)}
                 >
                   <Download size={15} />
                 </Button>

@@ -3,10 +3,13 @@ import { supabase } from "@/integrations/supabase/client";
 
 export interface HistoryEntry {
   id: string;
-  originalUrl: string;  // the original image URL or local object URL
-  resultUrl: string;    // Cloudinary URL returned by n8n
+  originalUrl: string;
+  resultUrl: string;
   filename: string;
-  processedAt: number;  // unix ms timestamp
+  processedAt: number;
+  generationTimeMs: number;
+  expectedTimeMs: number;
+  downloadCount: number;
 }
 
 export function useHistory() {
@@ -41,6 +44,9 @@ export function useHistory() {
           resultUrl: d.processed_image_url,
           filename: d.filename || "image.png",
           processedAt: new Date(d.created_at).getTime(),
+          generationTimeMs: d.generation_time_ms || 0,
+          expectedTimeMs: d.expected_time_ms || 0,
+          downloadCount: d.download_count || 0,
         })));
       }
     } catch (e) {
@@ -67,9 +73,39 @@ export function useHistory() {
         original_image_url: entry.originalUrl,
         processed_image_url: entry.resultUrl,
         filename: entry.filename,
+        generation_time_ms: entry.generationTimeMs,
+        expected_time_ms: entry.expectedTimeMs,
+        download_count: entry.downloadCount,
       });
     } catch (e) {
       console.error("Error adding history entry:", e);
+    }
+  };
+
+  const updateFileName = async (id: string, newFilename: string) => {
+    try {
+      setHistory((prev) => prev.map(e => e.id === id ? { ...e, filename: newFilename } : e));
+      await supabase.from("image_history").update({ filename: newFilename }).eq("id", id);
+    } catch (e) {
+      console.error("Error updating filename:", e);
+    }
+  };
+
+  const incrementDownload = async (id: string) => {
+    try {
+      setHistory((prev) => prev.map(e => e.id === id ? { ...e, downloadCount: e.downloadCount + 1 } : e));
+      
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+      
+      // We can do a fetch -> increment, or RPC. Let's do a simple read then update for simplicity here.
+      // Alternatively, just update using RPC wouldn't run into race condition as easily, but reading is fine.
+      const prevEntry = history.find(h => h.id === id);
+      if (prevEntry) {
+         await supabase.from("image_history").update({ download_count: prevEntry.downloadCount + 1 }).eq("id", id);
+      }
+    } catch (e) {
+      console.error("Error counting download:", e);
     }
   };
 
@@ -94,5 +130,5 @@ export function useHistory() {
     }
   };
 
-  return { history, loading, addEntry, removeEntry, clearHistory };
+  return { history, loading, addEntry, removeEntry, clearHistory, updateFileName, incrementDownload };
 }

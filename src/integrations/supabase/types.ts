@@ -21,6 +21,10 @@ export type Database = {
           original_image_url: string
           processed_image_url: string
           user_id: string
+          filename: string
+          generation_time_ms: number | null
+          expected_time_ms: number | null
+          download_count: number | null
         }
         Insert: {
           created_at?: string
@@ -28,6 +32,10 @@ export type Database = {
           original_image_url: string
           processed_image_url: string
           user_id: string
+          filename: string
+          generation_time_ms?: number | null
+          expected_time_ms?: number | null
+          download_count?: number | null
         }
         Update: {
           created_at?: string
@@ -35,6 +43,10 @@ export type Database = {
           original_image_url?: string
           processed_image_url?: string
           user_id?: string
+          filename?: string
+          generation_time_ms?: number | null
+          expected_time_ms?: number | null
+          download_count?: number | null
         }
         Relationships: []
       }
